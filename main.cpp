@@ -39,7 +39,7 @@ public:
     bool operator< (const Complex&) const;
     bool operator== (const Complex&) const;
     bool operator!= (const Complex&) const;
-    Complex operator= (const Complex&);
+    Complex &operator= (const Complex&);
     double modul() {
         return sqrt(real * real + imag * imag);
     }
@@ -65,7 +65,11 @@ public:
     Complex *v;
 
 
-    Vector_De_Complexe() {}
+    Vector_De_Complexe() {
+        v = NULL;
+        module = NULL;
+        lungime = 0;
+    }
 
     Vector_De_Complexe(const Vector_De_Complexe& s) {
         lungime = s.lungime;
@@ -76,8 +80,10 @@ public:
     }
 
     ~Vector_De_Complexe() {
-        delete v;
-        delete module;
+        if (lungime != 0) {
+            delete []v;
+            delete []module;
+        }
     }
 
     Complex& operator[] (int x) {
@@ -88,6 +94,7 @@ public:
     friend istream & operator >> (istream &in,  Vector_De_Complexe &c);
     Complex operator* (const Vector_De_Complexe& c) const;
     Vector_De_Complexe operator= (const Vector_De_Complexe& c);
+    Vector_De_Complexe operator+ (const Vector_De_Complexe&) const;
 
     void determinareModule() {
         module = new double[lungime + 1];
@@ -145,13 +152,14 @@ istream & operator >> (istream &in,  Vector_De_Complexe &c) {
     return in;
 }
 
-Complex Complex::operator=(const Complex& c)  {
+Complex &Complex::operator=(const Complex& c)  {
     this->real = c.real;
     this->imag = c.imag;
     return *this;
 }
 
 Vector_De_Complexe Vector_De_Complexe::operator=(const Vector_De_Complexe& s) {
+    if (v != NULL) delete []v;
     lungime = s.lungime;
     v = new Complex[lungime + 1];
     for (int i = 1; i <= s.lungime; i++)
@@ -198,11 +206,22 @@ Complex Vector_De_Complexe::operator* (const Vector_De_Complexe& c) const {
     return z;
 }
 
+Vector_De_Complexe Vector_De_Complexe::operator+(const Vector_De_Complexe& c) const {
+    int lg = lungime + c.lungime;
+    Vector_De_Complexe rezultat;
+    rezultat.v = new Complex[lg+2];
+    rezultat.lungime = lg;
+    for (int i = 1; i <= lungime; i++)
+        rezultat.v[i] = v[i];
+    for (int i = 1; i <= c.lungime; i++)
+        rezultat.v[lungime + i] = c.v[i];
+    return rezultat;
+}
 
 int main() {
 
 
-    int n;
+    /*int n;
     Complex sir[100];
 
     cin >> n;
@@ -217,7 +236,7 @@ int main() {
     for (int i = 1; i <= n; i++)
         g << sir[i] << ' ';
 
-
+    */
     Vector_De_Complexe s;
     cin >> s;
     cout << s << '\n';
@@ -239,6 +258,9 @@ int main() {
     cout << copie << '\n';
 
     Complex produs = copie * s;
-    cout << produs;
+    cout << produs << '\n';
+
+    copie = copie + s;
+    cout << copie;
     return 0;
 }
